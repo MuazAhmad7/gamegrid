@@ -1,0 +1,143 @@
+---
+alwaysApply: true
+---
+# GameGrid Deployment Rules
+
+## Overview
+Ensure seamless deployment across multiple platforms with proper configuration, optimization, and security settings.
+
+## Deployment Platforms
+
+### Recommended Platforms (in order of preference)
+1. **Railway** - Simple container-based deployment
+
+
+## Pre-Deployment Configuration
+
+### Next.js Configuration
+- Production optimizations (compression, security headers)
+- Image optimization for all target screen sizes
+- CORS configuration for API routes
+- Security headers (XSS protection, frame options, etc.)
+- Bundle analyzer integration
+- Static export capability
+
+
+### Package.json Scripts
+- build:analyze for bundle size analysis
+- build:export for static export builds
+- preview for testing production locally
+- type-check for TypeScript validation
+- clean for cleaning build files
+
+## Platform-Specific Configurations
+
+
+
+### Railway
+- Build and start command configuration
+- Health check setup
+- Restart policy configuration
+- Environment variable management
+
+
+## CORS Configuration Rules
+
+### API Route CORS
+- Environment-specific origin restrictions
+- Proper HTTP methods allowlist
+- Header configurations for security
+- Credentials handling for authentication
+
+### Global CORS Middleware
+- Request origin validation
+- Method and header restrictions
+- Preflight request handling
+- Security-first approach
+
+## Pre-Deployment Checklist
+
+### Build Optimization
+- Successful build completion
+- Bundle size analysis and optimization
+- TypeScript error resolution
+- Linting issue fixes
+- Local production testing
+
+### Performance Checks
+- Lighthouse score > 90 on all metrics
+- Core Web Vitals compliance
+- Image optimization (WebP/AVIF)
+- Unused dependency removal
+- Code splitting implementation
+
+### Security Checks
+- Environment variable configuration
+- API route authentication
+- CORS proper configuration
+- Security header implementation
+- Client bundle security audit
+
+### SEO & Meta
+- Meta tag configuration
+- Sitemap generation
+- Robots.txt setup
+- Open Graph implementation
+- Schema markup addition
+
+## Environment-Specific Rules
+
+### Development
+- Enable development tools and hot reload
+- Debug logging capabilities
+- Relaxed CORS for localhost
+
+### Staging
+- Production-like settings with test data
+- Limited external integrations
+- Performance monitoring setup
+
+### Production
+- Full optimization enabled
+- Error tracking implementation
+- Analytics integration
+- Performance monitoring
+
+## Monitoring & Analytics
+
+### Essential Monitoring
+- Google Analytics 4 integration
+- Error tracking (Sentry)
+- Performance monitoring
+- Uptime monitoring
+- User behavior analytics
+
+## Deployment Commands
+
+### Quick Deploy
+- Platform-specific CLI commands
+- Build verification steps
+- Environment variable checks
+- Domain configuration
+
+### Automated CI/CD
+- GitHub Actions workflow setup
+- Build and test automation
+- Environment-specific deployments
+- Rollback capabilities
+
+## Error Handling & Fallbacks
+
+### Global Error Boundaries
+- Client-side error handling
+- Graceful degradation
+- User-friendly error messages
+- Recovery mechanisms
+
+### Performance Monitoring
+- Bundle size tracking
+- Runtime performance metrics
+- Error rate monitoring
+- User experience tracking
+
+Remember: Always test deployment in staging environment before production release. Monitor performance and error rates after deployment.

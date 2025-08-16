@@ -1,0 +1,84 @@
+---
+alwaysApply: true
+---
+# GameGrid Cursor Rules
+
+## Project Overview
+Next.js 15.4.6 frontend application with TypeScript, Tailwind CSS v4, and comprehensive animation/UI libraries.
+
+## Core Dependencies
+
+### Framework & Core
+- **Next.js 15.4.6** with App Router
+- **React 19.1.0** & **TypeScript** - Always use TypeScript
+- **Tailwind CSS v4** - Use utility classes
+
+### UI Components & Styling
+- **shadcn/ui** - ALWAYS use shadcn/ui components before creating custom ones
+- **lucide-react** - PRIMARY icon library (verify icons exist at lucide.dev)
+- **react-icons** - Secondary icon library when Lucide doesn't have needed icons
+- **class-variance-authority** - For component variants
+- **tailwind-merge & clsx** - Use cn() utility for conditional classes
+
+### Animation Libraries
+- **framer-motion** - General React animations, page transitions
+- **gsap** - High-performance animations, scroll triggers
+- **@react-spring/web** - Physics-based animations
+- **lenis** - Smooth scrolling with inertia
+- **locomotive-scroll** - Parallax effects
+- **scrollreveal** - Simple scroll-triggered animations
+- **aos** - Basic scroll animations
+- **react-scroll-parallax** - Parallax effects
+
+### Carousels & Galleries
+- **swiper** - Touch sliders, modern carousels
+- **keen-slider** - Lightweight slider
+- **embla-carousel-react** - Minimal carousel
+- **react-slick** - Traditional carousel
+- **react-image-gallery** - Image galleries
+- **lightgallery** - Lightbox functionality
+
+## Coding Standards
+
+### Dependency Usage Rules
+- **NEVER hardcode** components that exist in dependencies
+- **ALWAYS verify** icon existence before using
+- **USE correct syntax** for installed dependency versions
+- **PREFER shadcn/ui** over custom components
+- **CHOOSE appropriate** animation library for the task
+
+### 2. Code Quality Standards
+- **COMPREHENSIVE COMMENTS**: Every function, component, and complex logic must have clear comments
+- **EXPLAIN WHY, not just WHAT**: Comments should explain the reasoning behind code decisions
+- **TYPE SAFETY**: Always use TypeScript interfaces and types
+- **ACCESSIBILITY**: Ensure components are accessible (ARIA labels, keyboard navigation)
+- **PERFORMANCE**: Use React best practices (memo, useMemo, useCallback when appropriate)
+
+### File Structure
+- Use Next.js app directory structure
+- Organize components in ui/ and custom/ folders
+- Separate hooks, types, and utilities
+
+### Animation Guidelines
+- Choose right tool: CSS/Tailwind for simple states, Framer Motion for transitions, GSAP for scroll animations
+- Performance first: use will-change, avoid layout animations
+- Respect prefers-reduced-motion
+
+### State Management
+- Use React built-ins first (useState, useReducer, useContext)
+- Consider React Query for server state
+- Use Zustand for complex state if needed
+
+### Error Prevention
+- Check documentation before implementing
+- Use TypeScript strictly (no any types)
+- Handle loading and error states
+- Test edge cases and provide fallbacks
+
+### Performance Guidelines
+- Lazy load components and images
+- Use dynamic imports for large libraries
+- Optimize bundle size
+- Monitor Core Web Vitals
+
+Remember: Leverage our dependency stack effectively while maintaining clean, performant, and accessible code.
