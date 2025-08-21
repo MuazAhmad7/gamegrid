@@ -19,8 +19,7 @@ gsap.registerPlugin(ScrollToPlugin);
 
 export default function Navbar({ 
   onFoundersClick, 
-  onNavigate, 
-  currentPage 
+  onNavigate 
 }: { 
   onFoundersClick?: () => void;
   onNavigate?: (sectionId: string) => void;

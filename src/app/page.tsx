@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, useRef } from "react";
 import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import Navbar from "@/components/custom/Navbar";
 // Removed Swiper - using pure CSS marquee
 
@@ -448,7 +448,7 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
     },
   ];
 
-  const storyText = "We're three co-founders: Bilaal Asghar, Waleed Tariq, and Zarir Hamza who've spent most of our lives in New Jersey. We met in college and bonded through what brought us all to the same place: sports, competition, and the love for the game.";
+
 
   return (
       <main className="bg-white pt-28 sm:pt-32">
@@ -484,7 +484,7 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
             transition={{ delay: 0.3, duration: 0.6 }}
             className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
-            The team behind GameGrid's mission to revolutionize grassroots sports
+            The team behind GameGrid&apos;s mission to revolutionize grassroots sports
           </motion.p>
         </div>
       </section>
@@ -570,7 +570,7 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
           </h2>
           <div className="text-gray-600 leading-relaxed text-lg max-w-4xl mx-auto space-y-6">
             <p>
-              We're three co-founders: <span className="font-bold text-[#0f5a1f]">Bilaal Asghar</span>, <span className="font-bold text-[#0f5a1f]">Waleed Tariq</span>, and <span className="font-bold text-[#0f5a1f]">Zarir Hamza</span> who've spent most of our lives in New Jersey. We met in college and bonded through what brought us all to the same place: sports, competition, and the love for the game.
+              We&apos;re three co-founders: <span className="font-bold text-[#0f5a1f]">Bilaal Asghar</span>, <span className="font-bold text-[#0f5a1f]">Waleed Tariq</span>, and <span className="font-bold text-[#0f5a1f]">Zarir Hamza</span> who&apos;ve spent most of our lives in New Jersey. We met in college and bonded through what brought us all to the same place: sports, competition, and the love for the game.
             </p>
             
             <p>
@@ -578,7 +578,7 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
             </p>
             
             <p>
-              That's when we decided to stop waiting and build it ourselves.
+              That&apos;s when we decided to stop waiting and build it ourselves.
             </p>
             
             <p>
@@ -586,11 +586,11 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
             </p>
             
             <p>
-              Right now, it might look like it started with basketball—but this is bigger than one sport. GameGrid is built to power every game, every team, and every league we can reach. Whether it's football, soccer, volleyball, basketball, cricket, or anything in between, our mission is to bring structure, stats, and spotlight to players everywhere, nationally and globally.
+              Right now, it might look like it started with basketball—but this is bigger than one sport. GameGrid is built to power every game, every team, and every league we can reach. Whether it&apos;s football, soccer, volleyball, basketball, cricket, or anything in between, our mission is to bring structure, stats, and spotlight to players everywhere, nationally and globally.
             </p>
             
                           <p>
-                We didn't come from big tech companies. We came from the courts, the group chats, and the weekend leagues where reputations are made bucket by bucket, goal by goal, point by point. <span className="font-bold text-[#0f5a1f]">That's why GameGrid hits different because it's made by the same people it's made for.</span>
+                We didn&apos;t come from big tech companies. We came from the courts, the group chats, and the weekend leagues where reputations are made bucket by bucket, goal by goal, point by point. <span className="font-bold text-[#0f5a1f]">That&apos;s why GameGrid hits different because it&apos;s made by the same people it&apos;s made for.</span>
               </p>
             
             <p>
@@ -1006,7 +1006,7 @@ function SportsImageSlider() {
     target.getBoundingClientRect();
     
     // Get viewport and container measurements
-    const viewportWidth = window.innerWidth;
+
     const containerElement = track.parentElement;
     if (!containerElement) return;
     
@@ -1106,7 +1106,7 @@ function SportsImageSlider() {
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     if (!isTouchDevice || !touchStartRef.current || !touchMoveRef.current) {
       touchStartRef.current = null;
       touchMoveRef.current = null;
@@ -1361,7 +1361,7 @@ function PlaceholderCardsSlider() {
     target.getBoundingClientRect();
     
     // Get viewport and container measurements
-    const viewportWidth = window.innerWidth;
+
     const containerElement = track.parentElement;
     if (!containerElement) return;
     
@@ -1463,7 +1463,7 @@ function PlaceholderCardsSlider() {
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     if (!isTouchDevice || !touchStartRef.current || !touchMoveRef.current) {
       touchStartRef.current = null;
       touchMoveRef.current = null;
