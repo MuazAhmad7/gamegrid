@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Asap_Condensed } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/custom/Navbar";
+
+
+// RootLayout: wraps every page. Controls global fonts, metadata, and shared UI (Navbar)
+// Edit tips:
+// - Fonts: adjust loaded Google fonts and CSS variables
+// - Navbar: remove or move <Navbar /> to hide/show globally
+// - Metadata: update title/description in `metadata`
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +29,19 @@ const asapCondensed = Asap_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "GameGrid",
+  title: "GameGrid | All-in-One Platform",
   description: "A modern gaming interface built with Next.js",
+  icons: {
+    icon: [
+      { url: "/logos/gamegrid-logo.png", sizes: "16x16", type: "image/png" },
+      { url: "/logos/gamegrid-logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/logos/gamegrid-logo.png", sizes: "48x48", type: "image/png" },
+    ],
+    shortcut: "/logos/gamegrid-logo.png",
+    apple: [
+      { url: "/logos/gamegrid-logo.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +55,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${asapCondensed.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Navbar />
         {children}
       </body>
     </html>

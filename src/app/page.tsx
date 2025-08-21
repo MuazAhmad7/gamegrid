@@ -1,16 +1,92 @@
 "use client";
+
+// Home page: combines hero, features, sports sliders, pricing, and footer
+// Edit tips:
+// - Hero rotating words: edit `words` array
+// - Hero images: swap `/logos/gamegrid-logo.png` and `/section-1/gg-phones.png`
+// - Features: change props passed to <FeatureCard/> and its images
+// - Integrations marquee: tune <CurvedIconMarqueeCard/> props
+// - Sports slider: update `sportsImages` list
+// - Metrics slider: update `placeholderCards` list
+// - Pricing: adjust <PricingCard/> props, features, and default `yearly` state
+// - Footer: update links and logo
 import Image from "next/image";
 import { useEffect, useMemo, useState, useRef } from "react";
 import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
+import Navbar from "@/components/custom/Navbar";
 // Removed Swiper - using pure CSS marquee
 
 export default function Home() {
-  const words = useMemo(() => ["EASY.", "FUN.", "EFFICIENT."], []);
+  const words = useMemo(() => ["EASY.", "FUN.", "EFFICIENT."], []); // rotating hero words
   const [index, setIndex] = useState(0);
   // Pricing toggle state
-  const [yearly, setYearly] = useState(false);
+  const [yearly, setYearly] = useState(false); // set true to default to yearly pricing
+  // Page state management
+  const [currentPage, setCurrentPage] = useState<'home' | 'founders'>('home');
+  const [foundersAnimationKey, setFoundersAnimationKey] = useState(0);
+
+  // Reset scroll position when changing pages, but allow for delayed scrolling to sections
+  const [targetSection, setTargetSection] = useState<string | null>(null);
+  
+  useEffect(() => {
+    console.log('useEffect triggered - currentPage:', currentPage, 'targetSection:', targetSection);
+    
+    if (currentPage === 'home' && targetSection) {
+      // Wait for the page transition animation to complete before scrolling
+      const scrollTimer = setTimeout(() => {
+        const elementId = targetSection.replace('#', '');
+        const element = document.getElementById(elementId);
+        
+        console.log('Looking for element with ID:', elementId, 'Found:', element);
+        
+        if (element) {
+          // Smooth scroll to the target section after transition
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          console.log('Smooth scrolling to element:', element);
+          setTargetSection(null); // Clear target section after scrolling
+        } else {
+          console.log('Element not found:', elementId, 'Available IDs:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
+          setTargetSection(null);
+        }
+      }, 700); // Wait for transition to complete (600ms transition + 100ms buffer)
+      
+      return () => clearTimeout(scrollTimer);
+    } else if (currentPage === 'founders') {
+      console.log('On founders page, scrolling to top');
+      window.scrollTo(0, 0);
+    }
+  }, [currentPage, targetSection]);
+
+  // Navigation handler for navbar links
+  const handleNavigation = (sectionId: string) => {
+    console.log('handleNavigation called with:', sectionId, 'current page:', currentPage);
+    
+    if (currentPage === 'founders') {
+      // If on founders page, go back to home with target section
+      console.log('Setting target section to:', sectionId);
+      if (sectionId === '#home') {
+        // For home, don't set target section, just go to home and scroll to top
+        setCurrentPage('home');
+        setTimeout(() => window.scrollTo(0, 0), 300);
+      } else {
+        // For other sections, set target section
+        setTargetSection(sectionId);
+        setCurrentPage('home');
+      }
+    } else {
+      // If already on home, just scroll to section
+      if (sectionId === '#home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const element = document.getElementById(sectionId.replace('#', ''));
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -20,27 +96,82 @@ export default function Home() {
   }, [words.length]);
 
   return (
-    <main id="home" className="pt-28 sm:pt-32">
+    <>
+      {/* Navigation */}
+      <Navbar 
+        onFoundersClick={() => {
+          setCurrentPage('founders');
+          setFoundersAnimationKey(prev => prev + 1);
+        }}
+        onNavigate={handleNavigation}
+        currentPage={currentPage}
+      />
+      
+      {/* Page Content with Conditional Rendering */}
+      <AnimatePresence mode="wait">
+        {currentPage === 'home' ? (
+          <motion.div
+            key="home"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200, duration: 0.6 }}
+          >
+            <HomeContent 
+              words={words}
+              index={index}
+              yearly={yearly}
+              setYearly={setYearly}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="founders"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200, duration: 0.6 }}
+          >
+            <FoundersPage onBack={() => setCurrentPage('home')} animationKey={foundersAnimationKey} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// Home page content component
+function HomeContent({ words, index, yearly, setYearly }: { 
+  words: string[]; 
+  index: number; 
+  yearly: boolean; 
+  setYearly: (value: boolean) => void; 
+}) {
+  return (
+      <main id="home" className="pt-28 sm:pt-32">
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-12">
           {/* Left: Logo + Title */}
           <div className="flex flex-col items-center text-center">
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden">
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36">
               <Image
                 src="/logos/gamegrid-logo.png"
                 alt="GameGrid logo"
                 fill
                 priority
-                className="object-cover drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+                className="object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
               />
             </div>
             <h1
-              className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight"
+              className="mt-6 text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight"
               style={{ fontFamily: "var(--font-gamegrid-title)" }}
             >
-              PLAYING IN LEAGUES HAS NEVER BEEN THIS
-              <span className="inline-block ml-2 align-baseline relative h-[1.2em] w-[11ch] overflow-hidden">
+              PLAYING IN LEAGUES
+              <br />
+              HAS NEVER BEEN THIS
+              <br />
+              <span className="inline-block align-baseline relative h-[1.2em] w-[11ch] overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={words[index]}
@@ -57,7 +188,7 @@ export default function Home() {
             </h1>
           </div>
 
-          {/* Right: Phones visual */}
+          {/* Right: Phones visual (swap src to change image) */}
           <div className="relative w-full h-[360px] sm:h-[460px] lg:h-[560px]">
             <Image
               src="/section-1/gg-phones.png"
@@ -73,7 +204,7 @@ export default function Home() {
 
 
 
-      {/* Section 2: Four Feature Cards */}
+      {/* Section 2: Four Feature Cards (edit FeatureCard props to change content) */}
       <section className="w-full mt-14 sm:mt-20 px-[1px] sm:px-[1px] lg:px-[2px]" id="features">
         <header className="text-center mb-10 sm:mb-14">
           <h2
@@ -91,25 +222,26 @@ export default function Home() {
               title="Real-Time Stat Engine"
               description="Instant, Accurate, Game-Changing. Track every bucket, goal, and stat in real time with our lightning-fast engine, built to keep players and leagues in sync without the mess."
               highlights={["Engine"]}
-              imageSrc="/section-2/laptop-mockup.png"
-              imageAlt="Laptop mockup showing GameGrid"
+              imageSrc="/section-2/ipad-mockup.png"
+              imageAlt="iPad mockup with stat engine"
             />
             <FeatureCard
               title="Player Dashboard"
               description="Know Your Game. And Everyone Else's. Players get full access to their performance history, live updates, and league-wide insights, so you're never out of the loop."
-              imageSrc="/section-2/ipad-mockup.png"
-              imageAlt="iPad mockup with player dashboard"
+              imageSrc="/section-2/player-dashboard.png"
+              imageAlt="Player dashboard mockup"
               imagePosition="bottom"
+              imageTiltDeg={-6}
             />
           </div>
 
-          {/* Column 2 (right, offset lower) */}
+          {/* Column 2 (right, offset lower). Adjust translate-y utilities to shift group vertically */}
           <div className="grid grid-rows-2 gap-[2px] sm:gap-[2px] content-stretch translate-y-20 sm:translate-y-28 lg:translate-y-32">
             <FeatureCard
               title="Strategy Hub"
               description="Plan. Execute. Dominate. Set weekly game plans, coordinate with your squad, and make every possession/play count because strategy wins games."
-              imageSrc="/section-2/phone-mockup.png"
-              imageAlt="Phone mockup with strategy hub"
+              imageSrc="/section-2/strategy-hub.png"
+              imageAlt="Strategy hub mockup"
               imagePosition="bottom"
             />
             <CurvedIconMarqueeCard />
@@ -117,7 +249,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 3: Quote and Image Sliders */}
+      {/* Section 3: Quote and Image Sliders (update lists in SportsImageSlider/PlaceholderCardsSlider) */}
       <section className="w-full mt-52 sm:mt-64 lg:mt-72" id="sports">
         {/* Quote */}
         <header className="text-center mb-12 sm:mb-16 lg:mb-20 px-4 sm:px-6 lg:px-8">
@@ -156,7 +288,7 @@ export default function Home() {
             <BillingToggle yearly={yearly} setYearly={setYearly} />
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <PricingCard
               tier="CORE"
               price={30}
@@ -165,7 +297,7 @@ export default function Home() {
               blurb="For leagues just starting out or managing smaller rosters."
               features={[
                 "Full access to all GameGrid features",
-                "Up to 12 teams",
+                "Up to 8 teams",
                 "1 active league",
                 "Complete stat tracking, schedules, standings, and rosters",
                 "Game logs and player profile pages",
@@ -173,39 +305,52 @@ export default function Home() {
               ]}
             />
             <PricingCard
-              tier="PLUS"
-              price={60}
-              yearlyPrice={55}
-              yearly={yearly}
-              blurb="For expanding leagues with larger team bases."
-              features={[
-                "Full access to all GameGrid features",
-                "Unlimited teams",
-                "1 active league",
-                "Real-time stat updates and advanced analytics",
-                "Season archives and exportable reports",
-                "Priority email and chat support",
-              ]}
-            />
-            <PricingCard
               tier="ELITE"
-              price={70}
-              yearlyPrice={65}
+              price={55}
+              yearlyPrice={50}
               yearly={yearly}
               blurb="For organizations managing multiple leagues and divisions."
               features={[
                 "Full access to all GameGrid features",
                 "Unlimited teams",
-                "Up to 3 active leagues",
+                "1 active league",
                 "Cross-league stat tracking and shared leaderboards",
                 "League-wide announcements, awards, and admin dashboards",
                 "Premium support with Slack/Discord integration",
               ]}
             />
+            <PricingCard
+              tier="TOURNAMENT"
+              customPricing="$100"
+              customPricingUnit="/event"
+              blurb="Built for one-time competitions, weekend tournaments, and showcase events."
+              variant="green"
+              features={[
+                "Run one tournament with complete access",
+                "Unlimited teams and flexible bracket options",
+                "Real-time stat entry and automated leaderboards",
+                "Team and player profile tracking",
+                "Exportable reports and standard email support",
+              ]}
+            />
+            <PricingCard
+              tier="ENTERPRISE"
+              customPricing="CUSTOM"
+              customPricingUnit=""
+              blurb="Tailored solutions for large organizations, schools, and national league systems."
+              variant="green"
+              features={[
+                "Custom team and league limits",
+                "White-label branding and platform configuration",
+                "API integrations and external system sync",
+                "Multi-admin access and audit tracking",
+                "Dedicated onboarding, training, and account management",
+              ]}
+            />
           </div>
         </div>
       </section>
-      {/* Footer */}
+      {/* Footer (update logo path and link URLs) */}
       <footer className="w-full mt-28 sm:mt-36 border-t border-black/10 bg-black text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -276,10 +421,200 @@ export default function Home() {
   );
 }
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// Founders Full Page Component
+function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationKey: number }) {
+
+  const foundersData = [
+    {
+      id: 1,
+      name: "Bilaal Asghar",
+      title: "Co-Founder",
+      bio: "Business Technology Analyst at Deloitte, driving GameGrid’s product design and scalable workflows to make league management effortless.",
+      image: "/founders/bilal.png",
+    },
+    {
+      id: 2,
+      name: "Waleed Tariq",
+      title: "Co-Founder", 
+      bio: "Division I Athlete and Captain, creator of GameGrid’s analytics engine, transforming raw data into advanced player performance insights.",
+      image: "/founders/waleed.png",
+    },
+    {
+      id: 3,
+      name: "Zarir Hamza",
+      title: "Co-Founder",
+      bio: "Software Engineer at Datadog, leading GameGrid’s entire tech stack to ensure a reliable, scalable, and future-ready multi-sport platform.",
+      image: "/founders/zarir.png",
+    },
+  ];
+
+  const storyText = "We're three co-founders: Bilaal Asghar, Waleed Tariq, and Zarir Hamza who've spent most of our lives in New Jersey. We met in college and bonded through what brought us all to the same place: sports, competition, and the love for the game.";
+
+  return (
+      <main className="bg-white pt-28 sm:pt-32">
+      {/* Header */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="text-center">
+          <motion.button
+            onClick={onBack}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="inline-flex items-center gap-2 text-[#0f5a1f] hover:text-[#0d4e1b] font-medium mb-8 transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Back to Home
+          </motion.button>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
+            style={{ fontFamily: "var(--font-gamegrid-title)" }}
+          >
+            The Founders
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+          >
+            The team behind GameGrid's mission to revolutionize grassroots sports
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Co-Founders Grid */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+          {foundersData.map((founder, index) => (
+            <motion.div
+              key={`founder-${founder.id}-${animationKey}`} // Force remount with animation key
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + index * 0.15, duration: 0.6 }}
+              className="text-center"
+            >
+              <div className="relative w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
+                <Image
+                  src={founder.image}
+                  alt={founder.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: "var(--font-gamegrid-title)" }}>
+                {founder.name}
+              </h3>
+              <p className="text-[#0f5a1f] font-medium mb-4 text-lg">
+                {founder.title}
+              </p>
+              {/* Bio reveals with position-specific animations */}
+              <motion.div
+                key={`bio-container-${founder.id}-${animationKey}`} // Force remount
+                initial={{ 
+                  opacity: 0, 
+                  // Left (index 0): from right diagonal (current)
+                  // Right (index 2): from left diagonal  
+                  // Middle (index 1): from bottom up
+                  x: index === 0 ? -30 : index === 2 ? 30 : 0,
+                  y: index === 1 ? 40 : 30
+                }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ 
+                  // Left first (1.2s), Right second (1.6s), Middle last (2.0s)
+                  delay: index === 0 ? 1.2 : index === 2 ? 1.6 : 2.0,
+                  duration: 0.8,
+                  ease: [0.25, 0.46, 0.45, 0.94] // Custom easing for smooth movement
+                }}
+                className="overflow-hidden"
+              >
+                <motion.p 
+                  key={`bio-text-${founder.id}-${animationKey}`} // Force remount
+                  className="text-gray-600 leading-relaxed"
+                  initial={{ 
+                    opacity: 0, 
+                    x: index === 0 ? -20 : index === 2 ? 20 : 0,
+                    y: index === 1 ? 30 : 20
+                  }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
+                  transition={{ 
+                    delay: index === 0 ? 1.4 : index === 2 ? 1.8 : 2.2,
+                    duration: 0.6,
+                    ease: "easeOut"
+                  }}
+                >
+                  {founder.bio}
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Story Section */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="p-8 sm:p-12"
+        >
+          <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center text-[#0f5a1f]" style={{ fontFamily: "var(--font-gamegrid-title)" }}>
+            Our Story: From Players to Builders
+          </h2>
+          <div className="text-gray-600 leading-relaxed text-lg max-w-4xl mx-auto space-y-6">
+            <p>
+              We're three co-founders: <span className="font-bold text-[#0f5a1f]">Bilaal Asghar</span>, <span className="font-bold text-[#0f5a1f]">Waleed Tariq</span>, and <span className="font-bold text-[#0f5a1f]">Zarir Hamza</span> who've spent most of our lives in New Jersey. We met in college and bonded through what brought us all to the same place: sports, competition, and the love for the game.
+            </p>
+            
+            <p>
+              From running pickup runs to organizing full leagues, we lived through the chaos—lost stats, messy schedules, teams scrambling last minute, and no real way to track your performance unless someone remembered to keep score. It felt like for all the effort players were putting in, there was nothing built for us. Nothing that matched our grind.
+            </p>
+            
+            <p>
+              That's when we decided to stop waiting and build it ourselves.
+            </p>
+            
+            <p>
+              We created GameGrid not just as an app, but as a platform. A clean, powerful, easy-to-use engine to run your league, track every stat, manage teams, and give players the recognition they earn on the court, field, turf, or wherever they compete. No fluff. No overcomplication. Just the tools athletes actually need to keep the game organized, competitive, and real.
+            </p>
+            
+            <p>
+              Right now, it might look like it started with basketball—but this is bigger than one sport. GameGrid is built to power every game, every team, and every league we can reach. Whether it's football, soccer, volleyball, basketball, cricket, or anything in between, our mission is to bring structure, stats, and spotlight to players everywhere, nationally and globally.
+            </p>
+            
+                          <p>
+                We didn't come from big tech companies. We came from the courts, the group chats, and the weekend leagues where reputations are made bucket by bucket, goal by goal, point by point. <span className="font-bold text-[#0f5a1f]">That's why GameGrid hits different because it's made by the same people it's made for.</span>
+              </p>
+            
+            <p>
+              What started in Jersey is just the beginning.
+            </p>
+            
+            <p className="font-bold text-[#0f5a1f] text-xl mt-8">
+              Built for the grind. Made for the game.
+            </p>
+            
+            <p className="font-bold text-[#0f5a1f] text-xl">
+              This is GameGrid.
+            </p>
+          </div>
+        </motion.div>
+      </section>
+      </main>
+  );
+}
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // shared card primitives
 import CurvedIconMarquee from "@/components/custom/CurvedIconMarquee";
 
-function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, imagePosition = "center" }: { title: string; description: string; highlights?: string[]; imageSrc?: string; imageAlt?: string; imagePosition?: "center" | "bottom" }) {
+function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, imagePosition = "center", imageTiltDeg }: { title: string; description: string; highlights?: string[]; imageSrc?: string; imageAlt?: string; imagePosition?: "center" | "bottom"; imageTiltDeg?: number }) {
   const renderHighlightedTitle = (text: string) => {
     const parts = text.split(/(\s+)/);
     return (
@@ -320,7 +655,12 @@ function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, 
         </div>
         <div className="flex-1 relative">
           {imageSrc ? (
-            <Image src={imageSrc} alt={imageAlt || title} fill className="object-contain object-bottom" />
+            <div
+              className="absolute left-1/2 top-1/2 h-64 sm:h-80 w-full"
+              style={{ transform: `translate(-50%, -60%) rotate(${imageTiltDeg ?? 6}deg)` }}
+            >
+              <Image src={imageSrc} alt={imageAlt || title} fill className="object-contain" />
+            </div>
           ) : null}
         </div>
       </div>
@@ -353,11 +693,11 @@ function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, 
       </CardHeader>
       <CardContent className="flex items-center justify-center pb-12">
         {imageSrc ? (
-          <div className="relative h-80 sm:h-[28rem] w-full rounded-xl overflow-hidden">
+          <div className="relative h-60 sm:h-[22rem] w-full rounded-xl overflow-hidden rotate-[-6deg]">
             <Image src={imageSrc} alt={imageAlt || title} fill className="object-contain" />
           </div>
         ) : (
-          <div className="h-80 sm:h-[28rem] w-full rounded-xl" />
+          <div className="h-60 sm:h-[22rem] w-full rounded-xl" />
         )}
       </CardContent>
     </Card>
@@ -458,45 +798,82 @@ function BillingToggle({ yearly, setYearly }: { yearly: boolean; setYearly: (v: 
 }
 
 type PricingCardProps = {
-  tier: 'CORE' | 'PLUS' | 'ELITE';
-  price: number;
-  yearlyPrice: number;
-  yearly: boolean;
+  tier: 'CORE' | 'PLUS' | 'ELITE' | 'TOURNAMENT' | 'ENTERPRISE';
+  price?: number;
+  yearlyPrice?: number;
+  yearly?: boolean;
   blurb: string;
   features: string[];
+  variant?: 'default' | 'green';
+  customPricing?: string;
+  customPricingUnit?: string;
 };
 
-function PricingCard({ tier, price, yearlyPrice, yearly, blurb, features }: PricingCardProps) {
-  const shown = yearly ? yearlyPrice : price;
+function PricingCard({ tier, price, yearlyPrice, yearly, blurb, features, variant = 'default', customPricing, customPricingUnit }: PricingCardProps) {
+  const shown = yearly && yearlyPrice ? yearlyPrice : price;
+  const isGreen = variant === 'green';
+  
+  // Dynamic classes based on variant
+  const containerClasses = isGreen 
+    ? "rounded-2xl border border-[#0f5a1f]/20 bg-[#0f5a1f] p-6 sm:p-8 flex flex-col shadow-sm max-w-[360px] sm:max-w-[380px] w-full mx-auto min-h-[520px] sm:min-h-[560px] shadow-[0_0_40px_rgba(15,90,31,0.7)] hover:shadow-[0_0_60px_rgba(15,90,31,0.8)] transition-shadow duration-300"
+    : "rounded-2xl border border-black/10 bg-white p-6 sm:p-8 flex flex-col shadow-sm max-w-[360px] sm:max-w-[380px] w-full mx-auto min-h-[520px] sm:min-h-[560px]";
+  
+  const tierClasses = isGreen ? "text-white/90 font-bold text-sm tracking-wide" : "text-[#0f5a1f] font-bold text-sm tracking-wide";
+  const priceClasses = isGreen ? "text-4xl sm:text-5xl font-extrabold text-white" : "text-4xl sm:text-5xl font-extrabold";
+  const unitClasses = isGreen ? "text-sm font-medium text-white/70 mb-1" : "text-sm font-medium text-black/60 mb-1";
+  const buttonClasses = isGreen ? "mt-4 inline-flex w-full justify-center rounded-full bg-white text-[#0f5a1f] font-semibold py-2.5 text-sm hover:opacity-90" : "mt-4 inline-flex w-full justify-center rounded-full bg-black text-white font-semibold py-2.5 text-sm hover:opacity-90";
+  const dividerClasses = isGreen ? "h-px w-full bg-white/20 my-3" : "h-px w-full bg-black/10 my-3";
+  const blurbClasses = isGreen ? "text-base sm:text-lg font-semibold text-white mb-3" : "text-base sm:text-lg font-semibold text-black mb-3";
+  const featureTextClasses = isGreen ? "flex items-start gap-2 text-sm text-white/90" : "flex items-start gap-2 text-sm text-black/80";
+  const checkClasses = isGreen ? "h-5 w-5 mt-0.5 text-white flex-shrink-0" : "h-5 w-5 mt-0.5 text-[#0f5a1f] flex-shrink-0";
+
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-6 sm:p-8 flex flex-col shadow-sm max-w-[360px] sm:max-w-[380px] w-full mx-auto min-h-[520px] sm:min-h-[560px]">
+    <div className={containerClasses}>
       <div className="mb-4">
-        <div className="text-[#0f5a1f] font-bold text-sm tracking-wide">{tier}</div>
-        <motion.div layout className="mt-3 flex items-end gap-1">
-          <motion.div
-            key={shown}
-            initial={{ y: 12, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="text-4xl sm:text-5xl font-extrabold"
-          >
-            ${shown}
-          </motion.div>
-          <div className="text-sm font-medium text-black/60 mb-1">/month</div>
+        <div className={tierClasses}>{tier}</div>
+        <motion.div layout className="mt-0 flex items-end gap-1 min-h-[4rem] sm:min-h-[5rem]">
+          {customPricing ? (
+            <motion.div
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className={customPricing === 'CUSTOM' ? (isGreen ? "text-lg font-medium text-white/60 flex items-end" : "text-lg font-medium text-gray-500 flex items-end") : priceClasses}
+            >
+              {customPricing}
+            </motion.div>
+          ) : (
+            <motion.div
+              key={shown}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className={priceClasses}
+            >
+              ${shown}
+            </motion.div>
+          )}
+          <div className={unitClasses}>{customPricingUnit || (customPricing === 'CUSTOM' ? '' : '/month')}</div>
         </motion.div>
-        <button className="mt-4 inline-flex w-full justify-center rounded-full bg-black text-white font-semibold py-2.5 text-sm hover:opacity-90">Book a demo</button>
+        <a 
+          href={tier === 'ENTERPRISE' ? 'https://calendly.com/gamegrid/30min' : 'https://calendly.com/gamegrid/30min'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClasses}
+        >
+          {tier === 'ENTERPRISE' ? 'Get in touch with sales' : 'Book a demo'}
+        </a>
       </div>
 
-      <div className="h-px w-full bg-black/10 my-3"/>
+      <div className={dividerClasses}/>
 
       <div>
-        <div className="text-base sm:text-lg font-semibold text-black mb-3" style={{ fontFamily: 'var(--font-gamegrid-title)' }}>
+        <div className={blurbClasses} style={{ fontFamily: 'var(--font-gamegrid-title)' }}>
           {blurb}
         </div>
         <ul className="space-y-3">
           {features.map((f, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-black/80">
-              <Check className="h-4 w-4 mt-0.5 text-[#0f5a1f]"/>
+            <li key={i} className={featureTextClasses}>
+              <Check className={checkClasses}/>
               <span>{f}</span>
             </li>
           ))}
@@ -510,6 +887,7 @@ function SportsImageSlider() {
   const [isHovered, setIsHovered] = useState(false);
   const [isClickPaused, setIsClickPaused] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tickerInitedRef = useRef(false);
   const xRef = useRef(0);
@@ -518,7 +896,12 @@ function SportsImageSlider() {
   const clickPausedRef = useRef(false);
   const navTweenRef = useRef<gsap.core.Tween | null>(null);
   
-  const sportsImages = [
+  // Touch handling refs
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchMoveRef = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+  
+  const sportsImages = [ // swap image src/title/alt to change slides
     { src: "/section-3/basketball.jpeg", alt: "Basketball Game", title: "Basketball" },
     { src: "/section-3/football.jpg", alt: "Football Game", title: "Football" },
     { src: "/section-3/pickleball.jpg", alt: "Pickleball Game", title: "Pickleball" },
@@ -527,7 +910,35 @@ function SportsImageSlider() {
 
   // Duplicate exactly twice for seamless -50% translation
   const baseImages = sportsImages;
-  const duplicatedImages = [...baseImages, ...baseImages];
+  const duplicatedImages = [...baseImages, ...baseImages]; // needed for seamless wrap
+
+  // Detect if device is primarily touch-based (mobile/tablet, not hybrid laptops)
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      // Touch capability detection
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
+      // Mobile/tablet user agent detection
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Screen size detection
+      const isSmallScreen = window.innerWidth <= 1024; // tablets and phones
+      
+      // Desktop OS detection (to exclude touch laptops)
+      const isDesktopOS = /Windows NT|Macintosh|Linux/i.test(navigator.userAgent) && !isMobile;
+      
+      // Determine if it's a touch device
+      // TRUE if: (has touch AND (is mobile OR small screen)) AND NOT desktop OS with large screen
+      const touchResult = hasTouch && (isMobile || isSmallScreen) && !(isDesktopOS && window.innerWidth > 1024);
+      
+
+      
+      setIsTouchDevice(touchResult);
+    };
+    checkTouchDevice();
+    window.addEventListener('resize', checkTouchDevice);
+    return () => window.removeEventListener('resize', checkTouchDevice);
+  }, []);
 
   // Measure one full cycle width (one set of items)
   useEffect(() => {
@@ -588,24 +999,63 @@ function SportsImageSlider() {
     if (!track) return;
     const baseCount = baseImages.length;
     // choose item from the 2nd set for stability
-    // const items = track.children as unknown as HTMLElement[];
     const target = (track.children[baseCount + index] as HTMLElement) || (track.children[index] as HTMLElement);
     if (!target) return;
-    const containerWidth = (track.parentElement as HTMLElement).offsetWidth;
+    
+    // Force layout calculation to ensure accurate measurements
+    target.getBoundingClientRect();
+    
+    // Get viewport and container measurements
+    const viewportWidth = window.innerWidth;
+    const containerElement = track.parentElement;
+    if (!containerElement) return;
+    
+    // Get the container's actual width and position
+    const containerBounds = containerElement.getBoundingClientRect();
+    const containerWidth = containerBounds.width;
+    
+    // Get slide measurements
     const slideWidth = target.offsetWidth;
     const targetLeft = target.offsetLeft;
-    // desired x so that target centers
-    let desiredX = containerWidth / 2 - slideWidth / 2 - targetLeft;
-    const cycle = cycleWidthRef.current || 1;
-    while (desiredX > 0) desiredX -= cycle;
-    while (desiredX <= -cycle) desiredX += cycle;
+    
+    // Calculate perfect centering: slide center should align with container center
+    // This ensures the full slide is visible and properly centered
+    let desiredX = (containerWidth / 2) - (slideWidth / 2) - targetLeft;
+    
+    // Ensure slide stays within bounds (safety check)
+    const maxLeftPosition = 0;
+    const minLeftPosition = containerWidth - slideWidth;
+    const slideLeftPosition = targetLeft + desiredX;
+    
+    if (slideLeftPosition > maxLeftPosition) {
+      desiredX = maxLeftPosition - targetLeft;
+    } else if (slideLeftPosition < minLeftPosition) {
+      desiredX = minLeftPosition - targetLeft;
+    }
+    
+    // Handle cycle wrapping for seamless scrolling
+    const cycle = cycleWidthRef.current;
+    if (cycle > 0) {
+      // Normalize within cycle bounds - ensure we stay within one cycle
+      while (desiredX > 0) {
+        desiredX -= cycle;
+      }
+      while (desiredX <= -cycle) {
+        desiredX += cycle;
+      }
+    }
+    
     if (navTweenRef.current) navTweenRef.current.kill();
     navTweenRef.current = gsap.to(track, {
       x: desiredX,
       duration: 0.6,
       ease: 'power2.out',
-      onUpdate: () => { xRef.current = (gsap.getProperty(track, 'x') as number) || desiredX; },
-      onComplete: () => { xRef.current = desiredX; }
+      onUpdate: () => { 
+        xRef.current = (gsap.getProperty(track, 'x') as number) || desiredX; 
+      },
+      onComplete: () => { 
+        xRef.current = desiredX; 
+      }
     });
   };
 
@@ -625,14 +1075,76 @@ function SportsImageSlider() {
     setTimeout(() => { if (!hoveredRef.current) setIsClickPaused(false); }, 1500);
   };
 
+  // Touch event handlers for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isTouchDevice) return;
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+    isDraggingRef.current = false;
+    setIsClickPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isTouchDevice || !touchStartRef.current) return;
+    const touch = e.touches[0];
+    touchMoveRef.current = {
+      x: touch.clientX,
+      y: touch.clientY
+    };
+    
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    
+    // If horizontal movement is greater than vertical, it's a swipe
+    if (deltaX > deltaY && deltaX > 10) {
+      isDraggingRef.current = true;
+      e.preventDefault(); // Prevent scrolling
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isTouchDevice || !touchStartRef.current || !touchMoveRef.current) {
+      touchStartRef.current = null;
+      touchMoveRef.current = null;
+      isDraggingRef.current = false;
+      return;
+    }
+
+    const deltaX = touchMoveRef.current.x - touchStartRef.current.x;
+    const deltaY = Math.abs(touchMoveRef.current.y - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // Determine if it's a valid swipe (horizontal movement > 50px, time < 500ms, horizontal > vertical)
+    if (Math.abs(deltaX) > 50 && deltaTime < 500 && Math.abs(deltaX) > deltaY) {
+      if (deltaX > 0) {
+        handlePrev(); // Swipe right = previous
+      } else {
+        handleNext(); // Swipe left = next
+      }
+    }
+
+    // Reset touch tracking
+    touchStartRef.current = null;
+    touchMoveRef.current = null;
+    isDraggingRef.current = false;
+    setTimeout(() => { if (!isDraggingRef.current) setIsClickPaused(false); }, 300);
+  };
+
   return (
     <div 
       className={`relative w-full marquee marquee-sports`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Navigation Arrows */}
-      {isHovered && (
+      {/* Navigation Arrows - Only show on non-touch devices */}
+      {isHovered && !isTouchDevice && (
         <>
           <button
             onClick={handlePrev}
@@ -694,6 +1206,7 @@ function PlaceholderCardsSlider() {
   const [isHovered, setIsHovered] = useState(false);
   const [isClickPaused, setIsClickPaused] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tickerInitedRef = useRef(false);
   const xRef = useRef(0);
@@ -702,7 +1215,12 @@ function PlaceholderCardsSlider() {
   const clickPausedRef = useRef(false);
   const navTweenRef = useRef<gsap.core.Tween | null>(null);
   
-  const placeholderCards = [
+  // Touch handling refs
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchMoveRef = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+  
+  const placeholderCards = [ // update metric/title/description per card
     {
       id: 1,
       metric: "+100,000",
@@ -756,7 +1274,35 @@ function PlaceholderCardsSlider() {
 
   // Duplicate exactly twice for seamless -50% translation
   const baseCards = placeholderCards;
-  const duplicatedCards = [...baseCards, ...baseCards];
+  const duplicatedCards = [...baseCards, ...baseCards]; // seamless wrap
+
+  // Detect if device is primarily touch-based (mobile/tablet, not hybrid laptops)
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      // Touch capability detection
+      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
+      // Mobile/tablet user agent detection
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Screen size detection
+      const isSmallScreen = window.innerWidth <= 1024; // tablets and phones
+      
+      // Desktop OS detection (to exclude touch laptops)
+      const isDesktopOS = /Windows NT|Macintosh|Linux/i.test(navigator.userAgent) && !isMobile;
+      
+      // Determine if it's a touch device
+      // TRUE if: (has touch AND (is mobile OR small screen)) AND NOT desktop OS with large screen
+      const touchResult = hasTouch && (isMobile || isSmallScreen) && !(isDesktopOS && window.innerWidth > 1024);
+      
+
+      
+      setIsTouchDevice(touchResult);
+    };
+    checkTouchDevice();
+    window.addEventListener('resize', checkTouchDevice);
+    return () => window.removeEventListener('resize', checkTouchDevice);
+  }, []);
 
   // measure cycle width
   useEffect(() => {
@@ -810,20 +1356,63 @@ function PlaceholderCardsSlider() {
     const baseCount = baseCards.length;
     const target = (track.children[baseCount + index] as HTMLElement) || (track.children[index] as HTMLElement);
     if (!target) return;
-    const containerWidth = (track.parentElement as HTMLElement).offsetWidth;
+    
+    // Force layout calculation to ensure accurate measurements
+    target.getBoundingClientRect();
+    
+    // Get viewport and container measurements
+    const viewportWidth = window.innerWidth;
+    const containerElement = track.parentElement;
+    if (!containerElement) return;
+    
+    // Get the container's actual width and position
+    const containerBounds = containerElement.getBoundingClientRect();
+    const containerWidth = containerBounds.width;
+    
+    // Get slide measurements
     const slideWidth = target.offsetWidth;
     const targetLeft = target.offsetLeft;
-    let desiredX = containerWidth / 2 - slideWidth / 2 - targetLeft;
-    const cycle = cycleWidthRef.current || 1;
-    while (desiredX > 0) desiredX -= cycle;
-    while (desiredX <= -cycle) desiredX += cycle;
+    
+    // Calculate the desired center position
+    // We want the slide center to align with the container center
+    const containerCenter = containerWidth / 2;
+    const slideCenter = slideWidth / 2;
+    
+    // Calculate desired X position to center the slide
+    let desiredX = containerCenter - slideCenter - targetLeft;
+    
+    // For very large slides that nearly fill the viewport, adjust centering strategy
+    const slideToContainerRatio = slideWidth / containerWidth;
+    if (slideToContainerRatio > 0.85) {
+      // If slide takes up more than 85% of container, use a more conservative centering
+      // This helps with xl breakpoint slides (1280px) on smaller viewports
+      const availableSpace = containerWidth - slideWidth;
+      desiredX = (availableSpace / 2) - targetLeft;
+    }
+    
+    // Handle cycle wrapping for seamless scrolling
+    const cycle = cycleWidthRef.current;
+    if (cycle > 0) {
+      // Normalize within cycle bounds - ensure we stay within one cycle
+      while (desiredX > 0) {
+        desiredX -= cycle;
+      }
+      while (desiredX <= -cycle) {
+        desiredX += cycle;
+      }
+    }
+    
     if (navTweenRef.current) navTweenRef.current.kill();
     navTweenRef.current = gsap.to(track, {
       x: desiredX,
       duration: 0.6,
       ease: 'power2.out',
-      onUpdate: () => { xRef.current = (gsap.getProperty(track, 'x') as number) || desiredX; },
-      onComplete: () => { xRef.current = desiredX; }
+      onUpdate: () => { 
+        xRef.current = (gsap.getProperty(track, 'x') as number) || desiredX; 
+      },
+      onComplete: () => { 
+        xRef.current = desiredX; 
+      }
     });
   };
 
@@ -843,14 +1432,76 @@ function PlaceholderCardsSlider() {
     setTimeout(() => { if (!hoveredRef.current) setIsClickPaused(false); }, 1500);
   };
 
+  // Touch event handlers for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isTouchDevice) return;
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+    isDraggingRef.current = false;
+    setIsClickPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isTouchDevice || !touchStartRef.current) return;
+    const touch = e.touches[0];
+    touchMoveRef.current = {
+      x: touch.clientX,
+      y: touch.clientY
+    };
+    
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    
+    // If horizontal movement is greater than vertical, it's a swipe
+    if (deltaX > deltaY && deltaX > 10) {
+      isDraggingRef.current = true;
+      e.preventDefault(); // Prevent scrolling
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isTouchDevice || !touchStartRef.current || !touchMoveRef.current) {
+      touchStartRef.current = null;
+      touchMoveRef.current = null;
+      isDraggingRef.current = false;
+      return;
+    }
+
+    const deltaX = touchMoveRef.current.x - touchStartRef.current.x;
+    const deltaY = Math.abs(touchMoveRef.current.y - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // Determine if it's a valid swipe (horizontal movement > 50px, time < 500ms, horizontal > vertical)
+    if (Math.abs(deltaX) > 50 && deltaTime < 500 && Math.abs(deltaX) > deltaY) {
+      if (deltaX > 0) {
+        handlePrev(); // Swipe right = previous
+      } else {
+        handleNext(); // Swipe left = next
+      }
+    }
+
+    // Reset touch tracking
+    touchStartRef.current = null;
+    touchMoveRef.current = null;
+    isDraggingRef.current = false;
+    setTimeout(() => { if (!isDraggingRef.current) setIsClickPaused(false); }, 300);
+  };
+
   return (
     <div 
       className={`relative w-full marquee marquee-cards`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Navigation Arrows */}
-      {isHovered && (
+      {/* Navigation Arrows - Only show on non-touch devices */}
+      {isHovered && !isTouchDevice && (
         <>
           <button
             onClick={handlePrev}

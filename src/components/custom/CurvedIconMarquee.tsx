@@ -1,4 +1,11 @@
 "use client";
+
+// CurvedIconMarquee: animates a row of app icons along a curved SVG path
+// Edit tips:
+// - Default look/behavior: tweak default props (height, radius, arc, speed, gap, iconSize, inset, offsetY)
+// - Images: pass `images` prop or edit fallback `srcs` list below
+// - Responsiveness: adjust `responsive` rules (min/max and settings) to override defaults at widths
+// - Animation speed: change `speed` (seconds per loop) or per-item animationDelay formula
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -55,7 +62,7 @@ export default function CurvedIconMarquee({
     [images]
   );
 
-  // Measure track width so the path fits the real rendered width
+  // Measure track width: drives geometry/responsive overrides
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState<number>(0);
   useEffect(() => {
@@ -72,7 +79,7 @@ export default function CurvedIconMarquee({
     return () => ro.disconnect();
   }, []);
 
-  // Compute effective settings based on track width and responsive rules
+  // Compute effective settings from width + responsive rules
   const eff = useMemo(() => {
     const w = trackWidth || 0;
     const rule = responsive.find(r => {
@@ -93,7 +100,7 @@ export default function CurvedIconMarquee({
     };
   }, [trackWidth, responsive, height, radius, arc, speed, gap, iconSize, inset, offsetY]);
 
-  // Build path in actual pixels; clamp radius to fit inside height
+  // Build arc path string; clamps radius so icons stay within container height
   const pathData = useMemo(() => {
     const w = trackWidth || 1000;
     const cx = w / 2;
@@ -117,7 +124,7 @@ export default function CurvedIconMarquee({
     };
   }, [eff.arc, eff.radius, eff.height, eff.iconSize, eff.offsetY, trackWidth]);
 
-  // Build enough tiles to cover the arc seamlessly
+  // Duplicate enough tiles to fully cover the path without gaps
   const tiles = useMemo(() => {
     const approxArcLen = (Math.PI * Math.min(eff.radius, Math.max(20, eff.height - eff.iconSize * 0.5 - 8)) * eff.arc) / 180;
     const perTile = eff.iconSize + eff.gap;
@@ -133,17 +140,17 @@ export default function CurvedIconMarquee({
       style={{
         height: eff.height,
         width: "100%",
-        overflow: "hidden", // keep inside card
+        overflow: "hidden", // keep icons inside card
       }}
     >
-      {/* The track is wider than the card so items “come in” from sides */}
+      {/* Track wider than container: lets items enter/exit from the sides */}
       <div
         className="absolute left-1/2 -translate-x-1/2"
         ref={trackRef}
         style={{
           width: `calc(100% + ${eff.inset * 2}px)`,
           height: eff.height,
-          pointerEvents: "none", // no hover effects
+          pointerEvents: "none", // allow overlays above to capture pointer
         }}
       >
         <div
@@ -161,7 +168,7 @@ export default function CurvedIconMarquee({
               key={`${i}-${src}`}
               className="curved-item"
               style={{
-                animationDelay: `-${(i * (eff.speed / 10)).toFixed(3)}s`,
+                animationDelay: `-${(i * (eff.speed / 10)).toFixed(3)}s`, // edit formula to stagger differently
               }}
             >
               <div
@@ -174,7 +181,7 @@ export default function CurvedIconMarquee({
               >
                 <Image
                   src={src}
-                  alt=""
+                  alt="" // supply alt if needed for accessibility
                   fill
                   className="object-cover"
                   sizes={`${eff.iconSize}px`}
@@ -183,7 +190,7 @@ export default function CurvedIconMarquee({
             </div>
           ))}
 
-          {/* CSS: offset-path + animation (no hover rules) */}
+          {/* CSS: offset-path animation controlling curved movement */}
           <style>{`
             .curved-item {
               position: absolute;
