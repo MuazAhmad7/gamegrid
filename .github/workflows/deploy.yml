@@ -35,8 +35,11 @@ jobs:
         env:
           NODE_ENV: production
           STATIC_EXPORT: true
-          NEXT_PUBLIC_BASE_PATH: /gamegrid-website
-          
+          # Removed NEXT_PUBLIC_BASE_PATH to serve at root
+
+      - name: Add CNAME file
+        run: echo "www.gamegridtech.com" > out/CNAME
+        
       - name: Add .nojekyll file
         run: touch out/.nojekyll
         
