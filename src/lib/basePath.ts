@@ -4,6 +4,6 @@
  */
 export function getBasePath(path: string): string {
   const isGitHubPages = process.env.NEXT_PUBLIC_GITHUB_PAGES === 'true';
-  const basePath = isGitHubPages ? '/gamegrid' : '';
+  const basePath = isGitHubPages ? '/gamegrid-website' : '';
   return `${basePath}${path}`;
 }

@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   ...(isGitHubPages && {
     output: 'export',
     trailingSlash: true,
-    basePath: '/gamegrid',
-    assetPrefix: '/gamegrid',
+    basePath: '/gamegrid-website',
+    assetPrefix: '/gamegrid-website',
   }),
   
   // Production optimizations
