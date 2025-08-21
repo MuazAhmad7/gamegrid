@@ -16,6 +16,7 @@ import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Navbar from "@/components/custom/Navbar";
+import { getBasePath } from "@/lib/basePath";
 // Removed Swiper - using pure CSS marquee
 
 export default function Home() {
@@ -156,7 +157,7 @@ function HomeContent({ words, index, yearly, setYearly }: {
           <div className="flex flex-col items-center text-center">
             <div className="relative w-28 h-28 sm:w-36 sm:h-36">
               <Image
-                src="/logos/gamegrid-logo.png"
+                src={getBasePath("/logos/gamegrid-logo.png")}
                 alt="GameGrid logo"
                 fill
                 priority
@@ -191,7 +192,7 @@ function HomeContent({ words, index, yearly, setYearly }: {
           {/* Right: Phones visual (swap src to change image) */}
           <div className="relative w-full h-[360px] sm:h-[460px] lg:h-[560px]">
             <Image
-              src="/section-1/gg-phones.png"
+              src={getBasePath("/section-1/gg-phones.png")}
               alt="GameGrid mobile previews"
               fill
               className="object-contain"
@@ -222,13 +223,13 @@ function HomeContent({ words, index, yearly, setYearly }: {
               title="Real-Time Stat Engine"
               description="Instant, Accurate, Game-Changing. Track every bucket, goal, and stat in real time with our lightning-fast engine, built to keep players and leagues in sync without the mess."
               highlights={["Engine"]}
-              imageSrc="/section-2/ipad-mockup.png"
+              imageSrc={getBasePath("/section-2/ipad-mockup.png")}
               imageAlt="iPad mockup with stat engine"
             />
             <FeatureCard
               title="Player Dashboard"
               description="Know Your Game. And Everyone Else's. Players get full access to their performance history, live updates, and league-wide insights, so you're never out of the loop."
-              imageSrc="/section-2/player-dashboard.png"
+              imageSrc={getBasePath("/section-2/player-dashboard.png")}
               imageAlt="Player dashboard mockup"
               imagePosition="bottom"
               imageTiltDeg={-6}
@@ -240,7 +241,7 @@ function HomeContent({ words, index, yearly, setYearly }: {
             <FeatureCard
               title="Strategy Hub"
               description="Plan. Execute. Dominate. Set weekly game plans, coordinate with your squad, and make every possession/play count because strategy wins games."
-              imageSrc="/section-2/strategy-hub.png"
+              imageSrc={getBasePath("/section-2/strategy-hub.png")}
               imageAlt="Strategy hub mockup"
               imagePosition="bottom"
             />
@@ -357,7 +358,7 @@ function HomeContent({ words, index, yearly, setYearly }: {
             {/* Brand */}
             <div className="space-y-4">
               <Image
-                src="/logos/navbar.png"
+                src={getBasePath("/logos/navbar.png")}
                 alt="GameGrid logo"
                 width={120}
                 height={120}
@@ -902,10 +903,10 @@ function SportsImageSlider() {
   const isDraggingRef = useRef(false);
   
   const sportsImages = [ // swap image src/title/alt to change slides
-    { src: "/section-3/basketball.jpeg", alt: "Basketball Game", title: "Basketball" },
-    { src: "/section-3/football.jpg", alt: "Football Game", title: "Football" },
-    { src: "/section-3/pickleball.jpg", alt: "Pickleball Game", title: "Pickleball" },
-    { src: "/section-3/Soccer.jpg", alt: "Soccer Game", title: "Soccer" },
+    { src: getBasePath("/section-3/basketball.jpeg"), alt: "Basketball Game", title: "Basketball" },
+    { src: getBasePath("/section-3/football.jpg"), alt: "Football Game", title: "Football" },
+    { src: getBasePath("/section-3/pickleball.jpg"), alt: "Pickleball Game", title: "Pickleball" },
+    { src: getBasePath("/section-3/Soccer.jpg"), alt: "Soccer Game", title: "Soccer" },
   ];
 
   // Duplicate exactly twice for seamless -50% translation

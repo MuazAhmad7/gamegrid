@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { Menu, X } from "lucide-react";
+import { getBasePath } from "@/lib/basePath";
 
 // Register GSAP ScrollTo plugin for smooth scrolling functionality
 gsap.registerPlugin(ScrollToPlugin);
@@ -74,7 +75,7 @@ export default function Navbar({
             onClick={(e) => handleSmoothScroll(e, '#home')}
           >
             <Image
-              src="/logos/navbar.png" // swap this path to change the navbar logo
+              src={getBasePath("/logos/navbar.png")} // swap this path to change the navbar logo
               alt="GameGrid navbar logo"
               width={124}
               height={124}
