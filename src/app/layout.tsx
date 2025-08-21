@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Asap_Condensed } from "next/font/google";
+import { getBasePath } from "@/lib/basePath";
 import "./globals.css";
 
 
@@ -33,13 +34,13 @@ export const metadata: Metadata = {
   description: "A modern gaming interface built with Next.js",
   icons: {
     icon: [
-      { url: "/logos/gamegrid-logo.png", sizes: "16x16", type: "image/png" },
-      { url: "/logos/gamegrid-logo.png", sizes: "32x32", type: "image/png" },
-      { url: "/logos/gamegrid-logo.png", sizes: "48x48", type: "image/png" },
+      { url: getBasePath("/logos/gamegrid-logo.png"), sizes: "16x16", type: "image/png" },
+      { url: getBasePath("/logos/gamegrid-logo.png"), sizes: "32x32", type: "image/png" },
+      { url: getBasePath("/logos/gamegrid-logo.png"), sizes: "48x48", type: "image/png" },
     ],
-    shortcut: "/logos/gamegrid-logo.png",
+    shortcut: getBasePath("/logos/gamegrid-logo.png"),
     apple: [
-      { url: "/logos/gamegrid-logo.png", sizes: "180x180", type: "image/png" },
+      { url: getBasePath("/logos/gamegrid-logo.png"), sizes: "180x180", type: "image/png" },
     ],
   },
 };

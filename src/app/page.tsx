@@ -431,21 +431,21 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
       name: "Bilaal Asghar",
       title: "Co-Founder",
       bio: "Business Technology Analyst at Deloitte, driving GameGrid’s product design and scalable workflows to make league management effortless.",
-      image: "/founders/bilal.png",
+      image: getBasePath("/founders/bilal.png"),
     },
     {
       id: 2,
       name: "Waleed Tariq",
       title: "Co-Founder", 
       bio: "Division I Athlete and Captain, creator of GameGrid’s analytics engine, transforming raw data into advanced player performance insights.",
-      image: "/founders/waleed.png",
+      image: getBasePath("/founders/waleed.png"),
     },
     {
       id: 3,
       name: "Zarir Hamza",
       title: "Co-Founder",
       bio: "Software Engineer at Datadog, leading GameGrid’s entire tech stack to ensure a reliable, scalable, and future-ready multi-sport platform.",
-      image: "/founders/zarir.png",
+      image: getBasePath("/founders/zarir.png"),
     },
   ];
 
