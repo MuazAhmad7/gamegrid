@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "build:analyze": "ANALYZE=true npm run build",
-    "build:export": "EXPORT=true npm run build",
+    "build:export": "STATIC_EXPORT=true npm run build",
     "preview": "npm run build && npm run start",
     "clean": "rm -rf .next out",
     "postbuild": "npm run type-check"
