@@ -1,12 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // GitHub Pages configuration
+  output: 'export',
+  trailingSlash: true,
+  basePath: process.env.NODE_ENV === 'production' ? '/gamegrid' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/gamegrid' : '',
+  
   // Production optimizations
   compress: true,
   poweredByHeader: false,
   
   // Image optimization for GameGrid
   images: {
+    unoptimized: true, // Required for static export
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 768, 1024, 1280, 1536, 1920, 2560],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -81,14 +88,7 @@ const nextConfig: NextConfig = {
     },
   }),
   
-  // Static export configuration (run with EXPORT=true npm run build)
-  ...(process.env.EXPORT === 'true' && {
-    output: 'export',
-    trailingSlash: true,
-    images: {
-      unoptimized: true
-    }
-  })
+  // Bundle analyzer configuration remains the same
 };
 
 export default nextConfig;
