@@ -1,9 +1,8 @@
 /**
- * Helper function to handle base path for GitHub Pages deployment
- * Adds the correct prefix for images and other assets only for GitHub Pages
+ * Universal basePath helper - works everywhere via environment variable
+ * Uses the same NEXT_PUBLIC_BASE_PATH that Next.js uses for automatic prefixing
  */
 export function getBasePath(path: string): string {
-  const isGitHubPages = process.env.NEXT_PUBLIC_GITHUB_PAGES === 'true';
-  const basePath = isGitHubPages ? '/gamegrid-website' : '';
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   return `${basePath}${path}`;
 }

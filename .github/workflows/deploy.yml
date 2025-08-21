@@ -34,8 +34,8 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-          GITHUB_PAGES: true
-          NEXT_PUBLIC_GITHUB_PAGES: true
+          STATIC_EXPORT: true
+          NEXT_PUBLIC_BASE_PATH: /gamegrid-website
           
       - name: Add .nojekyll file
         run: touch out/.nojekyll
