@@ -1,11 +1,15 @@
 import type { NextConfig } from "next";
 
+const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig: NextConfig = {
-  // GitHub Pages configuration
-  output: 'export',
-  trailingSlash: true,
-  basePath: process.env.NODE_ENV === 'production' ? '/gamegrid' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/gamegrid' : '',
+  // GitHub Pages configuration - only apply for GitHub Pages
+  ...(isGitHubPages && {
+    output: 'export',
+    trailingSlash: true,
+    basePath: '/gamegrid',
+    assetPrefix: '/gamegrid',
+  }),
   
   // Production optimizations
   compress: true,
@@ -13,7 +17,7 @@ const nextConfig: NextConfig = {
   
   // Image optimization for GameGrid
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: isGitHubPages, // Only required for static export (GitHub Pages)
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 768, 1024, 1280, 1536, 1920, 2560],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
