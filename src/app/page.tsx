@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, useRef } from "react";
 import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Twitter, Instagram, Linkedin } from "lucide-react";
 import Navbar from "@/components/custom/Navbar";
 import { getBasePath } from "@/lib/basePath";
 // Removed Swiper - using pure CSS marquee
@@ -123,6 +123,10 @@ export default function Home() {
               index={index}
               yearly={yearly}
               setYearly={setYearly}
+              onFoundersClick={() => {
+                setCurrentPage('founders');
+                setFoundersAnimationKey(prev => prev + 1);
+              }}
             />
           </motion.div>
         ) : (
@@ -142,11 +146,12 @@ export default function Home() {
 }
 
 // Home page content component
-function HomeContent({ words, index, yearly, setYearly }: { 
+function HomeContent({ words, index, yearly, setYearly, onFoundersClick }: { 
   words: string[]; 
   index: number; 
   yearly: boolean; 
   setYearly: (value: boolean) => void; 
+  onFoundersClick: () => void;
 }) {
   return (
       <main id="home" className="pt-28 sm:pt-32">
@@ -378,8 +383,24 @@ function HomeContent({ words, index, yearly, setYearly }: {
                 Company
               </h4>
               <ul className="space-y-3 text-white/80 text-sm">
-                <li><a href="#pricing" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#founders" className="hover:text-white">The Founders</a></li>
+                <li>
+                  <a 
+                    href="https://calendly.com/gamegrid/30min" 
+                    className="hover:text-white transition-colors" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <button 
+                    onClick={onFoundersClick}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    The Founders
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -406,9 +427,42 @@ function HomeContent({ words, index, yearly, setYearly }: {
                 Socials
               </h4>
               <ul className="space-y-3 text-white/80 text-sm">
-                <li><a href="#" className="hover:text-white" aria-label="Twitter / X">Twitter/X</a></li>
-                <li><a href="#" className="hover:text-white" aria-label="Instagram">Instagram</a></li>
-                <li><a href="#" className="hover:text-white" aria-label="LinkedIn">LinkedIn</a></li>
+                <li>
+                  <a 
+                    href="http://x.com/gamegridtech" 
+                    className="hover:text-white flex items-center gap-2 transition-colors" 
+                    aria-label="Twitter / X"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Twitter className="w-4 h-4" />
+                    Twitter/X
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://www.instagram.com/gamegridtech/" 
+                    className="hover:text-white flex items-center gap-2 transition-colors" 
+                    aria-label="Instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Instagram className="w-4 h-4" />
+                    Instagram
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://www.linkedin.com/company/gamegridtech/" 
+                    className="hover:text-white flex items-center gap-2 transition-colors" 
+                    aria-label="LinkedIn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                    LinkedIn
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
