@@ -14,6 +14,7 @@ import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { Menu, X } from "lucide-react";
 import { getBasePath } from "@/lib/basePath";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Register GSAP ScrollTo plugin for smooth scrolling functionality
 gsap.registerPlugin(ScrollToPlugin);
@@ -68,11 +69,13 @@ export default function Navbar({
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">{/* change max width/padding to alter navbar container */}
         {/* Left: Brand */}
         <div className="flex items-center gap-2">
-          <Link 
-            href="#home" 
+          <button 
             aria-label="GameGrid Home" 
             className="inline-flex items-center"
-            onClick={(e) => handleSmoothScroll(e, '#home')}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate?.('#home');
+            }}
           >
             <Image
               src={getBasePath("/logos/navbar.png")} // swap this path to change the navbar logo
@@ -81,7 +84,7 @@ export default function Navbar({
               height={124}
               priority
             />
-          </Link>
+          </button>
         </div>
 
         {/* Center: Links */}
@@ -150,71 +153,125 @@ export default function Navbar({
       </nav>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-18 z-40">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          
-          {/* Menu Content */}
-          <div className="relative bg-white/95 backdrop-blur-md border-b border-black/10 shadow-lg">
-            <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-              <ul className="space-y-4">
-                <li>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsMobileMenuOpen(false); // close mobile menu
-                      onNavigate?.('#home');
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            className="md:hidden fixed inset-0 top-18 z-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Backdrop */}
+            <motion.div 
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            
+            {/* Menu Content */}
+            <motion.div 
+              className="relative bg-white/95 backdrop-blur-md border-b border-black/10 shadow-lg"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                <motion.ul 
+                  className="space-y-4"
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.1,
+                        delayChildren: 0.1
+                      }
+                    }
+                  }}
+                >
+                  <motion.li
+                    variants={{
+                      hidden: { y: 10, opacity: 0 },
+                      visible: { y: 0, opacity: 1 }
                     }}
-                    className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
                   >
-                    Home
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsMobileMenuOpen(false); // close mobile menu
-                      onFoundersClick?.();
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false); // close mobile menu
+                        onNavigate?.('#home');
+                      }}
+                      className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                    >
+                      Home
+                    </button>
+                  </motion.li>
+                  <motion.li
+                    variants={{
+                      hidden: { y: 10, opacity: 0 },
+                      visible: { y: 0, opacity: 1 }
                     }}
-                    className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
                   >
-                    The Founders
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsMobileMenuOpen(false); // close mobile menu
-                      onNavigate?.('#pricing');
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false); // close mobile menu
+                        onFoundersClick?.();
+                      }}
+                      className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                    >
+                      The Founders
+                    </button>
+                  </motion.li>
+                  <motion.li
+                    variants={{
+                      hidden: { y: 10, opacity: 0 },
+                      visible: { y: 0, opacity: 1 }
                     }}
-                    className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
                   >
-                    Pricing
-                  </button>
-                </li>
-                <li className="pt-4 border-t border-black/10">
-                  <a
-                    href="https://calendly.com/gamegrid/30min"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setIsMobileMenuOpen(false)} // close mobile menu
-                    className="block w-full text-center rounded-full px-6 py-3 text-lg font-bold text-white transition-all duration-200 hover:shadow-md"
-                    style={{ backgroundColor: "#0f5a1f" }}
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false); // close mobile menu
+                        onNavigate?.('#pricing');
+                      }}
+                      className="block w-full text-left px-4 py-3 text-lg font-bold text-foreground/90 hover:text-green-700 hover:bg-green-50 rounded-lg transition-all duration-200"
+                    >
+                      Pricing
+                    </button>
+                  </motion.li>
+                  <motion.li 
+                    className="pt-4 border-t border-black/10"
+                    variants={{
+                      hidden: { y: 10, opacity: 0 },
+                      visible: { y: 0, opacity: 1 }
+                    }}
                   >
-                    Book a Demo
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      )}
+                    <a
+                      href="https://calendly.com/gamegrid/30min"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMobileMenuOpen(false)} // close mobile menu
+                      className="block w-full text-center rounded-full px-6 py-3 text-lg font-bold text-white transition-all duration-200 hover:shadow-md"
+                      style={{ backgroundColor: "#0f5a1f" }}
+                    >
+                      Book a Demo
+                    </a>
+                  </motion.li>
+                </motion.ul>
+              </nav>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

@@ -230,12 +230,14 @@ function HomeContent({ words, index, yearly, setYearly, onFoundersClick }: {
               highlights={["Engine"]}
               imageSrc={getBasePath("/section-2/ipad-mockup.png")}
               imageAlt="iPad mockup with stat engine"
+              loading="eager"
             />
             <FeatureCard
               title="Player Dashboard"
               description="Know Your Game. And Everyone Else's. Players get full access to their performance history, live updates, and league-wide insights, so you're never out of the loop."
               imageSrc={getBasePath("/section-2/player-dashboard.png")}
               imageAlt="Player dashboard mockup"
+              loading="lazy"
               imagePosition="bottom"
               imageTiltDeg={-6}
             />
@@ -248,6 +250,7 @@ function HomeContent({ words, index, yearly, setYearly, onFoundersClick }: {
               description="Plan. Execute. Dominate. Set weekly game plans, coordinate with your squad, and make every possession/play count because strategy wins games."
               imageSrc={getBasePath("/section-2/strategy-hub.png")}
               imageAlt="Strategy hub mockup"
+              loading="lazy"
               imagePosition="bottom"
             />
             <CurvedIconMarqueeCard />
@@ -297,8 +300,8 @@ function HomeContent({ words, index, yearly, setYearly, onFoundersClick }: {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <PricingCard
               tier="CORE"
-              price={30}
-              yearlyPrice={25}
+              price={35}
+              yearlyPrice={30}
               yearly={yearly}
               blurb="For leagues just starting out or managing smaller rosters."
               features={[
@@ -669,7 +672,7 @@ function FoundersPage({ onBack, animationKey }: { onBack: () => void; animationK
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // shared card primitives
 import CurvedIconMarquee from "@/components/custom/CurvedIconMarquee";
 
-function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, imagePosition = "center", imageTiltDeg }: { title: string; description: string; highlights?: string[]; imageSrc?: string; imageAlt?: string; imagePosition?: "center" | "bottom"; imageTiltDeg?: number }) {
+function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, imagePosition = "center", imageTiltDeg, loading = "lazy" }: { title: string; description: string; highlights?: string[]; imageSrc?: string; imageAlt?: string; imagePosition?: "center" | "bottom"; imageTiltDeg?: number; loading?: "lazy" | "eager" }) {
   const renderHighlightedTitle = (text: string) => {
     const parts = text.split(/(\s+)/);
     return (
@@ -714,7 +717,14 @@ function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, 
               className="absolute left-1/2 top-1/2 h-64 sm:h-80 w-full"
               style={{ transform: `translate(-50%, -60%) rotate(${imageTiltDeg ?? 6}deg)` }}
             >
-              <Image src={imageSrc} alt={imageAlt || title} fill className="object-contain" />
+              <Image 
+                src={imageSrc} 
+                alt={imageAlt || title} 
+                fill 
+                className="object-contain" 
+                loading={loading}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             </div>
           ) : null}
         </div>
@@ -749,7 +759,14 @@ function FeatureCard({ title, description, highlights = [], imageSrc, imageAlt, 
       <CardContent className="flex items-center justify-center pb-12">
         {imageSrc ? (
           <div className="relative h-60 sm:h-[22rem] w-full rounded-xl overflow-hidden rotate-[-6deg]">
-            <Image src={imageSrc} alt={imageAlt || title} fill className="object-contain" />
+            <Image 
+              src={imageSrc} 
+              alt={imageAlt || title} 
+              fill 
+              className="object-contain" 
+              loading={loading}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
           </div>
         ) : (
           <div className="h-60 sm:h-[22rem] w-full rounded-xl" />
@@ -1231,6 +1248,8 @@ function SportsImageSlider() {
                   alt={image.alt}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
                 <div className="absolute top-4 left-4 right-24 sm:top-6 sm:left-6 sm:right-40">
